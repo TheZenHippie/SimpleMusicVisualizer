@@ -1,3 +1,5 @@
+<img width="1188" height="738" alt="Screenshot 2026-09-10 194930" src="https://github.com/user-attachments/assets/d6c060ac-e299-4e00-a006-fffbedf8b863" />
+<img width="1189" height="731" alt="Screenshot 2026-09-10 200527" src="https://github.com/user-attachments/assets/22ec78e2-2cc4-4967-bfc2-1fd2e419ed1d" />
 # ⚡ Cyberpunk Spectrum Engine
 
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple.svg?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
