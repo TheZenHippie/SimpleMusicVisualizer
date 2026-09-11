@@ -1,0 +1,466 @@
+<Window x:Class="SimpleMusicVisualizer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
+        xmlns:ui="clr-namespace:SimpleMusicVisualizer.UI"
+        mc:Ignorable="d"
+        Title="CYBERPUNK // SPECTRUM ENGINE v1.0"
+        Icon="pack://application:,,,/icon.ico"
+        Height="720" Width="1180"
+        MinWidth="960" MinHeight="580"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <!-- Cyberpunk Color Brushes -->
+        <SolidColorBrush x:Key="VoidBackground" Color="#070210" />
+        <SolidColorBrush x:Key="SurfaceBackground" Color="#0E0620" />
+        <SolidColorBrush x:Key="ElectricCyan" Color="#00F0FF" />
+        <SolidColorBrush x:Key="GlowingViolet" Color="#9D00FF" />
+        <SolidColorBrush x:Key="HotMagenta" Color="#FF007F" />
+        <SolidColorBrush x:Key="AcidLime" Color="#00FFA3" />
+        <SolidColorBrush x:Key="DimBorder" Color="#3300F0FF" />
+        <SolidColorBrush x:Key="MutedText" Color="#8B85A8" />
+        <SolidColorBrush x:Key="BrightText" Color="#F0EDF8" />
+
+        <!-- Neon Linear Gradient for Window Outer Border -->
+        <LinearGradientBrush x:Key="CyberGlowBorderBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#00F0FF" Offset="0.0" />
+            <GradientStop Color="#8A2BE2" Offset="0.5" />
+            <GradientStop Color="#FF007F" Offset="1.0" />
+        </LinearGradientBrush>
+
+        <!-- Header Window Action Button Style -->
+        <Style x:Key="WindowActionButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#8B85A8" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Width" Value="34" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#2600F0FF" />
+                                <Setter Property="Foreground" Value="#00F0FF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#4D00F0FF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Close Button Style (Red Hover) -->
+        <Style x:Key="WindowCloseButton" TargetType="Button" BasedOn="{StaticResource WindowActionButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#FF0055" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- HUD Mode Toggle Button Style -->
+        <Style x:Key="HudModeRadioButton" TargetType="RadioButton">
+            <Setter Property="Background" Value="#120626" />
+            <Setter Property="Foreground" Value="#8B85A8" />
+            <Setter Property="BorderBrush" Value="#408A2BE2" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12,5" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontFamily" Value="Consolas, Segoe UI" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#00F0FF" />
+                                <Setter Property="Foreground" Value="#00F0FF" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#2600F0FF" />
+                                <Setter TargetName="border" Property="BorderBrush" Value="#00F0FF" />
+                                <Setter Property="Foreground" Value="#00F0FF" />
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#00F0FF" BlurRadius="8" ShadowDepth="0" Opacity="0.6" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Cyberpunk Stream Toggle Button Style -->
+        <Style x:Key="CyberStreamToggleButtonStyle" TargetType="ToggleButton">
+            <Setter Property="Background" Value="#120626" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="10,5" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontFamily" Value="Consolas, Segoe UI" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#00F0FF"
+                                BorderThickness="1"
+                                CornerRadius="5"
+                                Padding="{TemplateBinding Padding}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse x:Name="dot" Width="7" Height="7" Fill="#00F0FF" Margin="0,0,6,0" />
+                                <TextBlock x:Name="txt" Text="LIVE AUDIO" Foreground="#00F0FF" FontWeight="Bold" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#26FF007F" />
+                                <Setter TargetName="border" Property="BorderBrush" Value="#FF007F" />
+                                <Setter TargetName="dot" Property="Fill" Value="#FF007F" />
+                                <Setter TargetName="txt" Property="Text" Value="SYNTH DEMO" />
+                                <Setter TargetName="txt" Property="Foreground" Value="#FF007F" />
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#FF007F" BlurRadius="8" ShadowDepth="0" Opacity="0.6" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Cyberpunk Styled ComboBox -->
+        <Style x:Key="CyberComboBox" TargetType="ComboBox">
+            <Setter Property="Background" Value="#0E0520" />
+            <Setter Property="Foreground" Value="#F0EDF8" />
+            <Setter Property="BorderBrush" Value="#4000F0FF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontFamily" Value="Consolas, Segoe UI" />
+            <Setter Property="Padding" Value="6,4" />
+        </Style>
+
+        <!-- Cyberpunk Slider Style -->
+        <Style x:Key="CyberSlider" TargetType="Slider">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="TickPlacement" Value="None" />
+        </Style>
+
+    </Window.Resources>
+
+    <!-- Outer Window Border with Neon Edge Glow -->
+    <Border CornerRadius="12"
+            BorderThickness="1.5"
+            BorderBrush="{StaticResource CyberGlowBorderBrush}"
+            Background="{StaticResource VoidBackground}">
+        <Border.Effect>
+            <DropShadowEffect Color="#00F0FF" BlurRadius="22" ShadowDepth="0" Opacity="0.32" />
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="46" /> <!-- Row 0: Custom Header Bar -->
+                <RowDefinition Height="*" />  <!-- Row 1: SkiaSharp Rendering View -->
+                <RowDefinition Height="Auto" /> <!-- Row 2: Floating HUD Control Dock -->
+            </Grid.RowDefinitions>
+
+            <!-- ========================================================= -->
+            <!-- ROW 0: CYBERPUNK HEADER / DRAG BAR                        -->
+            <!-- ========================================================= -->
+            <Border Grid.Row="0"
+                    Background="#0A0316"
+                    CornerRadius="10,10,0,0"
+                    BorderThickness="0,0,0,1"
+                    BorderBrush="#2600F0FF"
+                    MouseLeftButtonDown="Header_MouseLeftButtonDown">
+                <Grid Margin="14,0,10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left: Cyberpunk Branding -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Application Icon -->
+                        <Image Source="pack://application:,,,/icon.png" Width="22" Height="22" Margin="0,0,10,0" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality" />
+
+                        <!-- Glowing LED Status Beacon -->
+                        <Border Width="8" Height="8" CornerRadius="4" Background="#00F0FF" Margin="0,0,10,0">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#00F0FF" BlurRadius="6" ShadowDepth="0" Opacity="0.9" />
+                            </Border.Effect>
+                        </Border>
+
+                        <TextBlock Text="CYBERPUNK"
+                                   Foreground="#00F0FF"
+                                   FontFamily="Consolas, Segoe UI"
+                                   FontWeight="Black"
+                                   FontSize="13"
+                                   VerticalAlignment="Center" />
+
+                        <TextBlock Text=" // "
+                                   Foreground="#9D00FF"
+                                   FontFamily="Consolas, Segoe UI"
+                                   FontWeight="Bold"
+                                   FontSize="13"
+                                   VerticalAlignment="Center" />
+
+                        <TextBlock Text="SPECTRUM ENGINE v1.0"
+                                   Foreground="#F0EDF8"
+                                   FontFamily="Consolas, Segoe UI"
+                                   FontWeight="Bold"
+                                   FontSize="12"
+                                   VerticalAlignment="Center" />
+
+                        <Border Background="#1A8A2BE2"
+                                BorderBrush="#408A2BE2"
+                                BorderThickness="1"
+                                CornerRadius="3"
+                                Padding="5,1"
+                                Margin="12,0,0,0"
+                                VerticalAlignment="Center">
+                            <TextBlock Text="BLACKMAN-HARRIS FFT"
+                                       Foreground="#B370FF"
+                                       FontFamily="Consolas, Segoe UI"
+                                       FontSize="9"
+                                       FontWeight="SemiBold" />
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Center: Audio Status Stream Readout -->
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding AudioStatusText}"
+                               Foreground="#8B85A8"
+                               FontFamily="Consolas, Segoe UI"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+
+                    <!-- Right: Window Chrome Buttons -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Style="{StaticResource WindowActionButton}"
+                                Content="—"
+                                Command="{Binding MinimizeCommand}"
+                                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                                ToolTip="Minimize" />
+
+                        <Button Style="{StaticResource WindowActionButton}"
+                                Content="□"
+                                Command="{Binding MaximizeCommand}"
+                                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                                ToolTip="Maximize / Restore" />
+
+                        <Button Style="{StaticResource WindowCloseButton}"
+                                Content="✕"
+                                Command="{Binding CloseCommand}"
+                                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                                ToolTip="Close Visualizer" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- ROW 1: SKIASHARP HARDWARE ACCELERATED CANVAS             -->
+            <!-- ========================================================= -->
+            <Grid Grid.Row="1" ClipToBounds="True">
+                <views:SKElement x:Name="SkElement"
+                                 PaintSurface="SkElement_PaintSurface"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalAlignment="Stretch" />
+            </Grid>
+
+            <!-- ========================================================= -->
+            <!-- ROW 2: FLOATING HUD CONTROL BAR                           -->
+            <!-- ========================================================= -->
+            <Border Grid.Row="2"
+                    Margin="16,0,16,16"
+                    Background="#E60A0418"
+                    CornerRadius="10"
+                    BorderThickness="1"
+                    BorderBrush="#3300F0FF"
+                    Padding="14,10">
+                <Border.Effect>
+                    <DropShadowEffect Color="#00F0FF" BlurRadius="16" ShadowDepth="0" Opacity="0.16" />
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />  <!-- Mode Selectors -->
+                        <ColumnDefinition Width="18" />
+                        <ColumnDefinition Width="Auto" />  <!-- Simulation Toggle -->
+                        <ColumnDefinition Width="18" />
+                        <ColumnDefinition Width="Auto" />  <!-- Sensitivity Slider -->
+                        <ColumnDefinition Width="18" />
+                        <ColumnDefinition Width="*" />     <!-- Audio Device Dropdown -->
+                        <ColumnDefinition Width="18" />
+                        <ColumnDefinition Width="Auto" />  <!-- Status LED & FPS -->
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Section 1: Visualizer Mode Radio Buttons -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <RadioButton Style="{StaticResource HudModeRadioButton}"
+                                     Content="SPECTRUM BARS"
+                                     GroupName="VisualizerModeGroup"
+                                     IsChecked="{Binding IsBarsMode, Mode=OneWay}"
+                                     Command="{Binding SwitchModeCommand}"
+                                     CommandParameter="{x:Static ui:VisualizerMode.SpectrumBars}"
+                                     Margin="0,0,6,0" />
+
+                        <RadioButton Style="{StaticResource HudModeRadioButton}"
+                                     Content="RADIAL IRIS"
+                                     GroupName="VisualizerModeGroup"
+                                     IsChecked="{Binding IsRadialMode, Mode=OneWay}"
+                                     Command="{Binding SwitchModeCommand}"
+                                     CommandParameter="{x:Static ui:VisualizerMode.RadialIris}"
+                                     Margin="0,0,6,0" />
+
+                        <RadioButton Style="{StaticResource HudModeRadioButton}"
+                                     Content="LASER RIBBON"
+                                     GroupName="VisualizerModeGroup"
+                                     IsChecked="{Binding IsLaserMode, Mode=OneWay}"
+                                     Command="{Binding SwitchModeCommand}"
+                                     CommandParameter="{x:Static ui:VisualizerMode.LaserRibbon}" />
+                    </StackPanel>
+
+                    <!-- Section 2: Synthwave Demo vs Live Audio Toggle -->
+                    <ToggleButton Grid.Column="2"
+                                  Style="{StaticResource CyberStreamToggleButtonStyle}"
+                                  IsChecked="{Binding IsSimulationMode, Mode=TwoWay}"
+                                  VerticalAlignment="Center"
+                                  ToolTip="Toggle between WASAPI Live Loopback Capture and Procedural Cyberpunk Synthwave Stream" />
+
+                    <!-- Section 3: Sensitivity Slider -->
+                    <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="SENS:"
+                                   Foreground="#8B85A8"
+                                   FontFamily="Consolas, Segoe UI"
+                                   FontSize="11"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,6,0" />
+
+                        <Slider Style="{StaticResource CyberSlider}"
+                                Minimum="0.2"
+                                Maximum="3.0"
+                                SmallChange="0.05"
+                                LargeChange="0.2"
+                                Value="{Binding Sensitivity, Mode=TwoWay}"
+                                Width="90"
+                                ToolTip="Adjust visualizer amplitude gain" />
+
+                        <TextBlock Text="{Binding Sensitivity, StringFormat={}{0:F1}x}"
+                                   Foreground="#00F0FF"
+                                   FontFamily="Consolas, Segoe UI"
+                                   FontSize="11"
+                                   FontWeight="Bold"
+                                   Width="32"
+                                   TextAlignment="Right"
+                                   VerticalAlignment="Center"
+                                   Margin="4,0,0,0" />
+                    </StackPanel>
+
+                    <!-- Section 4: Audio Device Dropdown -->
+                    <StackPanel Grid.Column="6" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="DEVICE:"
+                                   Foreground="#8B85A8"
+                                   FontFamily="Consolas, Segoe UI"
+                                   FontSize="11"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,6,0" />
+
+                        <ComboBox Style="{StaticResource CyberComboBox}"
+                                  ItemsSource="{Binding AvailableDevices}"
+                                  SelectedIndex="{Binding SelectedDeviceIndex, Mode=TwoWay}"
+                                  MinWidth="140"
+                                  MaxWidth="260"
+                                  VerticalAlignment="Center"
+                                  ToolTip="Select audio output endpoint for loopback capture" />
+                    </StackPanel>
+
+                    <!-- Section 5: Audio Activity LED & FPS Counter -->
+                    <StackPanel Grid.Column="8" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Active Audio Signal LED -->
+                        <Border x:Name="AudioLedBorder"
+                                Width="10" Height="10"
+                                CornerRadius="5"
+                                Background="#334155"
+                                Margin="0,0,10,0"
+                                VerticalAlignment="Center"
+                                ToolTip="Audio signal presence indicator">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasAudioSignal}" Value="True">
+                                            <Setter Property="Background" Value="#00FFA3" />
+                                            <Setter Property="Effect">
+                                                <Setter.Value>
+                                                    <DropShadowEffect Color="#00FFA3" BlurRadius="8" ShadowDepth="0" Opacity="0.8" />
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
+
+                        <!-- FPS Counter Badge -->
+                        <Border Background="#120626"
+                                BorderBrush="#3300F0FF"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="8,3">
+                            <TextBlock Text="{Binding Fps, StringFormat={}{0:F0} FPS}"
+                                       Foreground="#00F0FF"
+                                       FontFamily="Consolas, Segoe UI"
+                                       FontSize="11"
+                                       FontWeight="Black"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

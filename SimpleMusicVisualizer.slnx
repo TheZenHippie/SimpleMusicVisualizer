@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SimpleMusicVisualizer.csproj" />
+  <Project Path="tests/SimpleMusicVisualizer.Tests/SimpleMusicVisualizer.Tests.csproj" />
+</Solution>
